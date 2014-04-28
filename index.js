@@ -1,7 +1,5 @@
 function Container() {
-  this.call = exports.call.bind(null,this);
-  this.apply = exports.apply.bind(null,this);
-  this.bind = exports.bind.bind(null,this);
+  this.call = depcall.bind(null,this);
   this._deps = {};
 }
 Container.prototype = {
@@ -37,32 +35,28 @@ function fulfil(from,dep) {
   return typeof from.get === "function" ? from.get(dep) : from[dep];
 }
 
-exports.container = function(deps) {
-  var cont = new Container;
-  return deps ? cont.put(deps) : cont;
-};
+var argsRe = /^function[^\(]*\(([^\)]*)/;
 
-var ARGS_RE = /^function[^\(]*\(([^\)]*)/;
-
-function prepareArguments(container,fun) {
+function depcall(container,fun) {
   if(typeof fun != "function") {
-    throw new Error("Provided non-function to apply arguments to");
+    throw new Error("can't call non-function");
   }
   if(typeof container == null) {
-    throw new Error("Missing container");
+    throw new Error("Missing container!");
   }
   var fs = fun + "";
 
-  var match = ARGS_RE.exec(fs);
+  var match = argsRe.exec(fs);
   var argNames = match[1].split(",").map("".trim.call.bind("".trim));
   if(argNames.length === 1 && argNames[0] === "") {
     return fun();
   }
 
   var positional = [].slice.call(arguments,2);
+
   var positionalArgsUsed = [];
 
-  return argNames.map(function(name,index) {
+  var args = argNames.map(function(name,index) {
     var dep = fulfil(container,name);
     if(dep != null) {
       if(positionalArgsUsed.length > 0) {
@@ -79,20 +73,14 @@ function prepareArguments(container,fun) {
     }
     return dep;
   });
+  return fun.apply(null,args);
 }
 
-exports.call = function(container,fun) {
-  return fun.apply(null,prepareArguments.apply(null,arguments));
-}
+module.exports = depcall;
+depcall.call = depcall;
+depcall._fulfil = fulfil;
+depcall.container = function(deps) {
+  var cont = new Container;
+  return deps ? cont.put(deps) : cont;
+};
 
-exports.apply = function(container,fun,args) {
-  var args = prepareArguments.apply(null,[container,fun].concat(args));
-  return exports.call.apply(null,args);
-}
-
-exports.bind = function(container,fun) {
-  var args = prepareArguments.apply(null,arguments);
-  return function() {
-    return fun.apply(null,args.concat(arguments));
-  }
-}

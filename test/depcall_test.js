@@ -42,7 +42,7 @@ describe("core API",function() {
 
   });
 
-  describe("apply",function() {
+  xdescribe("apply",function() {
     it("allows a function to be run with deps from a container",function() {
       deps.apply(container,databaseAdd,["a4gf",50,function(err,answer) {
         assert.equal(answer,60);
@@ -50,7 +50,7 @@ describe("core API",function() {
     });
   });
 
-  describe("bind",function() {
+  xdescribe("bind",function() {
     it("binds arguments from container to function for later execution",function() {
       var fn = deps.bind(container,databaseAdd,["a4gf",50,function(err,answer) {
         assert.equal(answer,60);
