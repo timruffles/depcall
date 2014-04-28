@@ -1,0 +1,24 @@
+{
+  "name": "depcall",
+  "version": "1.0.0",
+  "description": "call() and apply() with dependencies, to DRY up passing run-time dependencies to functional code",
+  "main": "y",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha test/*_test.js"
+  },
+  "keywords": [
+    "DI",
+    "dependency",
+    "injection"
+  ],
+  "author": "Tim Ruffles <oi@truffles.me.uk>",
+  "license": "BSD-2-Clause",
+  "devDependencies": {
+    "lodash": "~2.4.1",
+    "chai": "~1.9.1",
+    "mocha": "~1.18.2"
+  }
+}
